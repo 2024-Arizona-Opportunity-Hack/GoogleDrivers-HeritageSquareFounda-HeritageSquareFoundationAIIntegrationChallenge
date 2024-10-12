@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS Users;
+CREATE TABLE Users
+(
+    user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    user_password VARCHAR(255) NOT NULL
+);
+
+DROP TABLE IF EXISTS Files;
+CREATE TABLE Files
+(
+    file_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    file_name VARCHAR(255) NOT NULL,
+    file_link VARCHAR(255) NOT NULL,
+    file_date DATE NOT NULL,
+    file_category VARCHAR(255) NOT NULL
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
