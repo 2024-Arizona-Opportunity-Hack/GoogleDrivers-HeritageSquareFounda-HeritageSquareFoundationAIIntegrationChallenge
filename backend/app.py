@@ -10,7 +10,7 @@ load_dotenv()
 
 # Flask app setup
 app = Flask(__name__)
-app.secret_key = 'CLIENT_SECRET' 
+app.secret_key = os.getenv('CLIENT_SECRET') 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' 
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -64,7 +64,6 @@ def list_files():
     if service is None:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # List files
     results = service.files().list(fields="nextPageToken, files(id, name)").execute()
     files = results.get('files', [])
 
