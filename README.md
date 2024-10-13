@@ -53,7 +53,7 @@ We also ran into the trouble of navigating Google Drive's APIs but we were able 
 
 ## Tech Stack
 - Frontend: React.JS
-- Backend: Flask, Python
+- Backend: Flask, Python, Google OAuth 2.0
 - Database: Firebase
 - APIs: Google Drive, OpenAI
 <!-- Add/modify as needed -->
