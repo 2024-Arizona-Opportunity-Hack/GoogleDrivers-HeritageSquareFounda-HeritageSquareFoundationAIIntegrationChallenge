@@ -1,7 +1,8 @@
 import io
 from flask import jsonify
 from googleapiclient.http import MediaIoBaseDownload
-from flask import Flask, redirect, url_for, session, request, jsonify
+from flask import Flask, redirect, url_for, session, request, jsonify, send_from_directory
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import pickle
@@ -16,8 +17,10 @@ import docx
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
 
-cred = credentials.Certificate("../serviceAccountKey.json")
+cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -26,9 +29,15 @@ db = firestore.client()
 
 load_dotenv()
 # Flask app setup
-app = Flask(__name__)
-app.secret_key = os.getenv("CLIENT_SECRET")
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+app = Flask(__name__, static_folder='build')
+
+#for react
+CORS(app)
+
+app.secret_key = os.getenv('CLIENT_SECRET') 
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' 
+
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 CLIENT_SECRETS_FILE = "client_secrets.json"
@@ -41,6 +50,20 @@ flow = Flow.from_client_secrets_file(
     # redirect_uri="http://localhost:5000/callback",
     redirect_uri="http://localhost:5000/callback",
 )
+
+
+
+def get_link(service, file_id, filename):
+    permission = {
+        "type": "anyone",
+        "role": "reader",
+    }
+    service.permissions().create(fileId=file_id, body=permission).execute()
+
+    # Create the shareable link
+    shareable_link = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
+    print(f"Shareable link for {filename}: {shareable_link}")
+
 
 
 def query_files_by_category(service, file_category):
@@ -108,6 +131,7 @@ def tag_file(content):
     return tag
 
 
+
 def download_docx_from_drive(service, file_id):
 
     # Create a BytesIO object to hold the file content in memory
@@ -138,6 +162,7 @@ def download_docx_from_drive(service, file_id):
     # cleaned_text = re.sub(r'(?<=\w) (?=\w)', '', text)
 
     file_io.close()
+
 
     text = text.replace("\n", " ")
     return text
@@ -199,9 +224,13 @@ def get_gdrive_service():
     return service
 
 
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, '../frontend/public/index.html')
 # API: Initiate Google OAuth login
 @app.route("/login")
 def login():
+
     authorization_url, state = flow.authorization_url(
         access_type="offline", include_granted_scopes="true"
     )
@@ -212,10 +241,14 @@ def login():
 # API: OAuth callback to get user credentials
 @app.route("/callback")
 def callback():
+    print("HEY")
     flow.fetch_token(authorization_response=request.url)
+    print("HEY2")
     creds = flow.credentials
+
     session["credentials"] = pickle.dumps(creds)
     return redirect(url_for("list_files"))
+
 
 
 @app.route("/files", methods=["GET"])
@@ -326,7 +359,10 @@ def list_files():
                 }
             )
             tag = tag_file(content)
-            add_data("files", file_id, file_name, "N/A", time, tag)
+
+            file_hyperlink = get_link(service, file_id, file_name)
+            add_data("files", file_id, file_name, file_hyperlink, time, tag)
+
 
         except Exception as e:
             continue
@@ -342,7 +378,9 @@ def list_files():
             # })
             # add_data('files', file_id, file_name, "N/A", time, str(e))
 
-    return jsonify(file_contents)
+
+    return redirect('http://localhost:3000/heritage-square')
+
 
 
 def list_files_in_folder(service, folder_id):
@@ -441,6 +479,7 @@ def logout():
 
 @app.route("/queries", methods=["GET"])
 def queries():
+
     # Retrieve the 'category' query parameter from the request
     parameter = request.args.get("category")
 

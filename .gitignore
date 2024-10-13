@@ -3,3 +3,4 @@ __pycache__
 .env
 serviceAccountKey.json
 backend/sample_file.txt
+frontend/node_modules
