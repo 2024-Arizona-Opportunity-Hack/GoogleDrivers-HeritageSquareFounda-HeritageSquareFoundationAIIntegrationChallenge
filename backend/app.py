@@ -29,6 +29,7 @@ db = firestore.client()
 
 load_dotenv()
 # Flask app setup
+
 app = Flask(__name__, static_folder='build')
 
 #for react
@@ -36,6 +37,7 @@ CORS(app)
 
 app.secret_key = os.getenv('CLIENT_SECRET') 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' 
+
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 CLIENT_SECRETS_FILE = "client_secrets.json"
@@ -50,6 +52,7 @@ flow = Flow.from_client_secrets_file(
 )
 
 
+
 def get_link(service, file_id, filename):
     permission = {
         "type": "anyone",
@@ -60,6 +63,7 @@ def get_link(service, file_id, filename):
     # Create the shareable link
     shareable_link = f"https://drive.google.com/file/d/{file_id}/view?usp=sharing"
     print(f"Shareable link for {filename}: {shareable_link}")
+
 
 
 def query_files_by_category(service, file_category):
@@ -127,6 +131,7 @@ def tag_file(content):
     return tag
 
 
+
 def download_docx_from_drive(service, file_id):
 
     # Create a BytesIO object to hold the file content in memory
@@ -157,6 +162,7 @@ def download_docx_from_drive(service, file_id):
     # cleaned_text = re.sub(r'(?<=\w) (?=\w)', '', text)
 
     file_io.close()
+
 
     text = text.replace("\n", " ")
     return text
@@ -217,6 +223,7 @@ def get_gdrive_service():
     service = build("drive", "v3", credentials=creds)
     return service
 
+
 @app.route('/')
 def serve():
     return send_from_directory(app.static_folder, '../frontend/public/index.html')
@@ -238,10 +245,10 @@ def callback():
     flow.fetch_token(authorization_response=request.url)
     print("HEY2")
     creds = flow.credentials
-    print("HEY3")
-    session["credentials"] = pickle.dumps(creds)
 
+    session["credentials"] = pickle.dumps(creds)
     return redirect(url_for("list_files"))
+
 
 
 @app.route("/files", methods=["GET"])
@@ -352,8 +359,10 @@ def list_files():
                 }
             )
             tag = tag_file(content)
+
             file_hyperlink = get_link(service, file_id, file_name)
             add_data("files", file_id, file_name, file_hyperlink, time, tag)
+
 
         except Exception as e:
             continue
@@ -369,7 +378,9 @@ def list_files():
             # })
             # add_data('files', file_id, file_name, "N/A", time, str(e))
 
+
     return redirect('http://localhost:3000/heritage-square')
+
 
 
 def list_files_in_folder(service, folder_id):
@@ -468,10 +479,19 @@ def logout():
 
 @app.route("/queries", methods=["GET"])
 def queries():
-    parameter = "Research"
+
+    # Retrieve the 'category' query parameter from the request
+    parameter = request.args.get("category")
+
+    # Check if the parameter is provided
+    if not parameter:
+        return jsonify({"error": "Missing 'category' parameter"}), 400
+
+    # Call the function with the provided parameter
     results = query_files_by_category(
         service=get_gdrive_service(), file_category=parameter
     )
+
     return jsonify(results)
 
 
