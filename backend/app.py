@@ -1,7 +1,8 @@
 import io
 from flask import jsonify
 from googleapiclient.http import MediaIoBaseDownload
-from flask import Flask, redirect, url_for, session, request, jsonify
+from flask import Flask, redirect, url_for, session, request, jsonify, send_from_directory
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import pickle
@@ -26,7 +27,11 @@ db = firestore.client()
 
 load_dotenv()
 # Flask app setup
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build')
+
+#for react
+CORS(app)
+
 app.secret_key = os.getenv('CLIENT_SECRET') 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' 
 
@@ -183,6 +188,9 @@ def get_gdrive_service():
     service = build('drive', 'v3', credentials=creds)
     return service
 
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, '../frontend/public/index.html')
 # API: Initiate Google OAuth login
 @app.route('/login')
 def login():
@@ -299,7 +307,7 @@ def list_files():
             # add_data('files', file_id, file_name, "N/A", time, str(e))
 
 
-    return jsonify(file_contents)
+    return redirect('http://localhost:3000/heritage-square')
 
 def list_files_in_folder(service, folder_id):
     """ Helper function to list files in a given folder. """
