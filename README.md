@@ -34,7 +34,7 @@ Instructions on how to set up and run your project locally.
 # Example commands
 git clone [your-repo-link]
 cd [your-repo-name]
-npm install
+pip install openai 
 npm start
 ```
 
