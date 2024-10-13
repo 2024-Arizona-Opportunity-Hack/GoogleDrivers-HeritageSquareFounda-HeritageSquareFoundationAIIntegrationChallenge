@@ -16,6 +16,7 @@ import pickle
 import google.auth.transport.requests
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
+import pypdf.errors
 import requests
 import re
 # import PyPDF2
@@ -108,7 +109,7 @@ def download_docx_from_drive(service, file_id):
         return text
 
 def download_file_from_drive(service, file_id):
-
+    try:
         # Create a BytesIO object to hold the file content in memory
         file_io = io.BytesIO()     
         # Request the file from Google Drive
@@ -137,9 +138,13 @@ def download_file_from_drive(service, file_id):
         cleaned_text = re.sub(r'(?<=\w) (?=\w)', '', text)
 
         file_io.close()
-
-
+        
         return cleaned_text
+        
+    except pypdf.errors.PdfReadError:
+        return "PDF could not be read. It might be encrypted or malformed."
+    except Exception as e:
+        return str(e)
 
 # Helper function to get Google Drive API service
 def get_gdrive_service():
@@ -187,6 +192,11 @@ def list_files():
     
     results = service.files().list(fields="nextPageToken, files(id, name, mimeType)", q=query).execute()
     files = results.get('files', [])
+    
+    while 'nextPageToken' in results:
+        page_token = results['nextPageToken']
+        results = service.files().list(fields="nextPageToken, files(id, name, mimeType)", q=query, pageToken=page_token).execute()
+        files.extend(results.get('files', [])) 
 
     if not files:
         return jsonify({"message": "No files found"})
@@ -218,7 +228,8 @@ def list_files():
                 content = content.decode('utf-8')  # Decode bytes to string
             elif file['mimeType'] == 'application/pdf':
                 content = download_file_from_drive(service, file_id)
-                content = content.replace("\n", " ")
+                if isinstance(content, str):
+                    content = content.replace("\n", " ")
                 #print(content)
             elif file['mimeType'] == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                 content = download_docx_from_drive(service, file_id)
@@ -244,60 +255,6 @@ def list_files():
             })
 
     return jsonify(file_contents)
-# @app.route('/files', methods=['GET'])
-# def list_files():
-#     service = get_gdrive_service()
-#     if service is None:
-#         return jsonify({"error": "Unauthorized"}), 401
-
-#     folder_name = request.args.get('Geology', 'root')  # Get folder name from query parameters
-    
-#     if folder_name:
-#         # Search for the folder by name
-#         query = f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}'"
-#         folder_results = service.files().list(fields="files(id, name)", q=query).execute()
-#         folders = folder_results.get('files', [])
-        
-#         if not folders:
-#             return jsonify({"message": f"Folder '{folder_name}' not found"}), 404
-        
-#         # Use the first folder's ID (if multiple folders with the same name, it uses the first one)
-#         folder_id = folders[0]['id']
-#     else:
-#         return jsonify({"error": "Please provide a folder_name parameter."}), 400
-
-#     # Now list the contents of the found folder
-#     query = f"'{folder_id}' in parents"
-#     results = service.files().list(fields="nextPageToken, files(id, name, mimeType)", q=query).execute()
-#     files = results.get('files', [])
-
-#     if not files:
-#         return jsonify({"message": f"No files found in folder '{folder_name}'"})
-
-#     file_contents = []
-
-#     for file in files:
-#         file_id = file['id']
-#         file_name = file['name']
-#         mime_type = file['mimeType']
-
-#         # Check if the item is a folder
-#         if mime_type == 'application/vnd.google-apps.folder':
-#             folder_info = {
-#                 'id': file_id,
-#                 'name': file_name,
-#                 'type': 'folder',
-#                 'contents': list_files_in_folder(service, file_id)  # Call a helper function
-#             }
-#             file_contents.append(folder_info)
-#         else:
-#             file_contents.append({
-#                 'id': file_id,
-#                 'name': file_name,
-#                 'type': 'file'
-#             })
-
-#     return jsonify(file_contents)
 
 def list_files_in_folder(service, folder_id):
     """ Helper function to list files in a given folder. """
@@ -316,22 +273,43 @@ def list_files_in_folder(service, folder_id):
                 'id': file_id,
                 'name': file_name,
                 'type': 'folder',
-                'contents': list_files_in_folder(service, file_id)  # Recursively call the function
+                'contents': list_files_in_folder(service, file_id) 
             }
             contents.append(folder_info)
         else:
-            contents.append({
-                'id': file_id,
-                'name': file_name,
-                'type': 'file'
-            })
-            return contents
+            try:
+                if mime_type == 'application/vnd.google-apps.document':
+                    content = service.files().export(fileId=file_id, mimeType='text/plain').execute()
+                    content = content.decode('utf-8')  
+                elif file['mimeType'] == 'application/pdf':
+                    content = download_file_from_drive(service, file_id)
+                    if isinstance(content, str):
+                        content = content.replace("\n", " ")
+
+                elif file['mimeType'] == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    content = download_docx_from_drive(service, file_id)
+                
+                else:
+                    # For other file types, get the file content directly
+                    # content = service.files().get_media(fileId=file_id).execute()
+                    # content = content.decode('utf-8')  # Adjust based on expected encoding
+                    content = None
+                    
+                contents.append({
+                    'id': file_id,
+                    'name': file_name,
+                    'content': content,
+                    'type': 'file'
+                })
+                # return contents
+            except Exception as e:
+                contents.append({
+                    'id': file_id,
+                    'name': file_name,
+                    'error': str(e)
+                })
 
     return contents
-
-    
-# @app.route('find_documents', methods=['GET'])
-# def findDocuments(userInput):
     
 
 # API: Logout and clear session
