@@ -44,6 +44,7 @@ As a result they were looking for an easy way to get files that could be suited 
 -Docusort allows the user to make a prompt such as "Give me accounting files from November 2020" and will return the links of the files they would like straight to them
 -Gives easy access to pdf files and documents that they are seaching for, with room for error, which OpenAI will try and fill the gaps of knowledge as best as it can.
 -A login feature using google drive, ensuring that no other user can access your files, thus providing security.
+-An instruction's page clarifying the usage of the chat bot thus ensuring even the users with no prior knowledge of the technicality of the project could use it with no hussle.
 -Associate files to the categories that we were given with a miscellaneous section.
 -This gives Kari more time to help the community, and less time spent in her desk sorting through files.
 
@@ -64,9 +65,20 @@ As a result they were looking for an easy way to get files that could be suited 
 
 ## Stretch Goals/Scalability
 <!-- Add/modify as needed -->
+
 - Due to the short time frame we were not able to complete all of the goals as we wanted, but our basic layout allows for massive scalability
 - Stretch Goal 1: Implement AI into the prompt that allows you to ask for more abstract ideas with files, thus allowing more freedom and more suggestions to help you
 - Stretch Goal 2: Since we already read through the files we parse, we could use OpenAI to pick key words out of files, which can then be of use for problem statement 1, since the AI will have context clues about every file going into the conversation with the user 
+
+## Figma Designs
+https://www.figma.com/design/0IMH0XPRifrdhROfrLTjfw/opprtunity-hack?node-id=0-1&node-type=canvas&t=m1IH1jr2QVpmC6Sa-0
+
+![Screenshot 2024-10-13 010830](https://github.com/user-attachments/assets/5d88e832-a972-4586-82e9-94a106d5de7d)
+![Screenshot 2024-10-12 194208](https://github.com/user-attachments/assets/eac3e94b-8771-4f75-b8a5-0560894fe7e8)
+
+![Screenshot 2024-10-12 172358](https://github.com/user-attachments/assets/62da07df-3c4a-422c-8b67-ccc879b1c7aa)
+
+
 
 
 ## Your next steps
