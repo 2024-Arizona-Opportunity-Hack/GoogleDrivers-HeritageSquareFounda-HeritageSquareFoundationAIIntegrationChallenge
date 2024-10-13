@@ -2,7 +2,7 @@ import io
 from flask import jsonify
 from googleapiclient.http import MediaIoBaseDownload
 from flask import Flask, redirect, url_for, session, request, jsonify, send_from_directory
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from dotenv import load_dotenv
 import os
 import pickle
@@ -20,7 +20,7 @@ from firebase_admin import credentials, firestore
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
-cred = credentials.Certificate("serviceAccountKey.json")
+cred = credentials.Certificate("../serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -70,7 +70,7 @@ def query_files_by_category(service, file_category):
     try:
         # Build the query to search for files by name or any other field
         query = f"name contains '{file_category}'"  # Searching by name that contains the file_category
-
+        print(query)
         # Call the Drive API to list files based on the query
         results = (
             service.files()
@@ -207,12 +207,14 @@ def download_file_from_drive(service, file_id):
         return str(e)
 
 
+creds=None
+
 # Helper function to get Google Drive API service
 def get_gdrive_service():
-    creds = None
-    if "credentials" in session:
-        creds = pickle.loads(session["credentials"])
-
+    #creds = None
+    # if "credentials" in session:
+    #     creds = pickle.loads(session["credentials"])
+    global creds
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(google.auth.transport.requests.Request())
@@ -228,7 +230,7 @@ def get_gdrive_service():
 def serve():
     return send_from_directory(app.static_folder, '../frontend/public/index.html')
 # API: Initiate Google OAuth login
-@app.route("/login")
+@app.route("/login") 
 def login():
 
     authorization_url, state = flow.authorization_url(
@@ -241,13 +243,15 @@ def login():
 # API: OAuth callback to get user credentials
 @app.route("/callback")
 def callback():
+    global creds
     print("HEY")
     flow.fetch_token(authorization_response=request.url)
     print("HEY2")
     creds = flow.credentials
+    print(creds)
 
     session["credentials"] = pickle.dumps(creds)
-    return redirect(url_for("list_files"))
+    return redirect(url_for('list_files'))
 
 
 
@@ -480,6 +484,8 @@ def logout():
 @app.route("/queries", methods=["GET"])
 def queries():
 
+    sservice = get_gdrive_service()
+
     # Retrieve the 'category' query parameter from the request
     parameter = request.args.get("category")
 
@@ -489,7 +495,7 @@ def queries():
 
     # Call the function with the provided parameter
     results = query_files_by_category(
-        service=get_gdrive_service(), file_category=parameter
+        sservice, parameter
     )
 
     return jsonify(results)
