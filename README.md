@@ -16,25 +16,6 @@
 - Saranya https://github.com/Saranya060502
 <!-- Add all team members -->
 
-##Inspiration
-Docusort allows users to log in using their google email, and request files in a certain time frame or in a certain category.
-No longer will you have to look through your documents and PDFs to find files related to your prompt, we will give them to you.
-A problem that Heritage Square faced: A lack of a way to efficiently find the files they need to help them write and reply to those who use or give to their services.
-As a result they were looking for an easy way to get files that could be suited to their needs, and thus make finding files more efficient. 
-
-##What it Does
--Docusort allows the user to make a prompt such as "Give me accounting files from November 2020" and will return the links of the files they would like straight to them
--Gives easy access to pdf files and documents that they are seaching for, with room for error, which OpenAI will try and fill the gaps of knowledge as best as it can.
--A login feature using google drive, ensuring that no other user can access your files, thus providing security.
--Associate files to the categories that we were given with a miscellaneous section.
-
-## Tech Stack
-- Frontend: React.JS
-- Backend: Flask, Python
-- Database: Firebase
-- APIs: Google Drive, OpenAI
-<!-- Add/modify as needed -->
-
 
 ## Getting Started
 Instructions on how to set up and run your project locally.
@@ -57,6 +38,29 @@ pip install pypdf
 pip install pypdf
 
 
+## Inspiration
+Docusort allows users to log in using their google email, and request files in a certain time frame or in a certain category.
+No longer will you have to look through your documents and PDFs to find files related to your prompt, we will give them to you.
+A problem that Heritage Square faced: A lack of a way to efficiently find the files they need to help them write and reply to those who use or give to their services.
+As a result they were looking for an easy way to get files that could be suited to their needs, and thus make finding files more efficient. 
+
+## What it Does
+-Docusort allows the user to make a prompt such as "Give me accounting files from November 2020" and will return the links of the files they would like straight to them
+-Gives easy access to pdf files and documents that they are seaching for, with room for error, which OpenAI will try and fill the gaps of knowledge as best as it can.
+-A login feature using google drive, ensuring that no other user can access your files, thus providing security.
+-Associate files to the categories that we were given with a miscellaneous section.
+
+## Challenges
+We ran into the challenge of finding the right database, due to our lack of experience in the field finding databases was a struggle, especially to pick the right one.
+We also ran into the trouble of navigating Google Drive's APIs but we were able to persevere in the end and learn the calls.
+
+
+## Tech Stack
+- Frontend: React.JS
+- Backend: Flask, Python
+- Database: Firebase
+- APIs: Google Drive, OpenAI
+<!-- Add/modify as needed -->
 
 
 ## Your next steps
