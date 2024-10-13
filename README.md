@@ -44,6 +44,7 @@ As a result they were looking for an easy way to get files that could be suited 
 -Docusort allows the user to make a prompt such as "Give me accounting files from November 2020" and will return the links of the files they would like straight to them
 -Gives easy access to pdf files and documents that they are seaching for, with room for error, which OpenAI will try and fill the gaps of knowledge as best as it can.
 -A login feature using google drive, ensuring that no other user can access your files, thus providing security.
+-An instruction's page clarifying the usage of the chat bot thus ensuring even the users with no prior knowledge of the technicality of the project could use it with no hussle.
 -Associate files to the categories that we were given with a miscellaneous section.
 
 ## Challenges
