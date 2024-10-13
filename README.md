@@ -57,6 +57,13 @@ We also ran into the trouble of navigating Google Drive's APIs but we were able 
 - Database: Firebase
 - APIs: Google Drive, OpenAI
 <!-- Add/modify as needed -->
+## Figma Designs
+
+![Screenshot 2024-10-13 010830](https://github.com/user-attachments/assets/5d88e832-a972-4586-82e9-94a106d5de7d)
+![Screenshot 2024-10-12 194208](https://github.com/user-attachments/assets/eac3e94b-8771-4f75-b8a5-0560894fe7e8)
+
+![Screenshot 2024-10-12 172358](https://github.com/user-attachments/assets/62da07df-3c4a-422c-8b67-ccc879b1c7aa)
+
 
 
 ## Your next steps
