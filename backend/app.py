@@ -43,29 +43,29 @@ flow = Flow.from_client_secrets_file(
 
 )
 
-# def query_files_by_category(service, file_category):
-#     try:
-#         # Build the query to search for files by name or any other field
-#         query = f"name contains '{file_category}'"  # Searching by name that contains the file_category
+def query_files_by_category(service, file_category):
+    try:
+        # Build the query to search for files by name or any other field
+        query = f"name contains '{file_category}'"  # Searching by name that contains the file_category
         
-#         # Call the Drive API to list files based on the query
-#         results = service.files().list(
-#             q=query,
-#             fields="filename",  # Only get the file name
-#             pageSize=100  # Limit the number of results, increase if necessary
-#         ).execute()
+        # Call the Drive API to list files based on the query
+        results = service.files().list(
+            q=query,
+            fields="files(id, name)",  # Only get the file name
+            pageSize=100  # Limit the number of results, increase if necessary
+        ).execute()
         
-#         # Get the list of files from the result
-#         files = results.get('files', [])
+        # Get the list of files from the result
+        files = results.get('files', [])
         
-#         # Extract file names into an array
-#         file_names = [file['name'] for file in files]
+        # Extract file names into an array
+        file_names = [file['name'] for file in files]
         
-#         return file_names
+        return file_names
     
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-#         return []
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
 
 #files id:V8EAMEGMsTT9avb3ctjH
 def add_data(collection_name, file_id, filename, file_link, file_date, file_category):
@@ -379,11 +379,12 @@ def logout():
     session.pop('credentials', None)
     return jsonify({"message": "Logged out"}), 200
 
-# @app.route('/queries', method=['GET'])
-# def queries():
-#     parameter = 'Research'
-#     results = query_files_by_category(service=get_gdrive_service(), file_category=parameter)
-#     return jsonify(results)
+@app.route('/queries', methods=['GET'])
+def queries():
+    parameter = 'Research'
+    results = query_files_by_category(service=get_gdrive_service(), file_category=parameter)
+    return jsonify(results)
+
 # Run Flask server
 if __name__ == '__main__':
     #query_files_by_category(service=get_gdrive_service(), 'Research')
