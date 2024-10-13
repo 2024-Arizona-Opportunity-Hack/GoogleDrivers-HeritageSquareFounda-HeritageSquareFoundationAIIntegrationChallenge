@@ -29,7 +29,8 @@ pip install google-auth google-auth-oauthlib google-auth-httplib2
 pip install google-api-python-client
 pip install python-dotenv
 pip install pypdf
-pip install pypdf
+pip install python-docx
+pip install firebase-admin
 ```
 
 
