@@ -21,12 +21,6 @@
 Instructions on how to set up and run your project locally.
 
 ```bash
-# Example commands
-git clone [your-repo-link]
-cd [your-repo-name]
-pip install openai 
-npm start
-```
 git clone https://github.com/2024-Arizona-Opportunity-Hack/GoogleDrivers-HeritageSquareFounda-HeritageSquareFoundationAIIntegrationChallenge.git
 cd GoogleDrivers-HeritageSquareFounda-HeritageSquareFoundationAIIntegrationChallenge
 pip install openai
@@ -36,6 +30,8 @@ pip install google-api-python-client
 pip install python-dotenv
 pip install pypdf
 pip install pypdf
+```
+
 
 
 ## Inspiration
